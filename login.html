@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - India Museum Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonts for richer typographic feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      /* Full-bleed background image with gradient overlay */
+      html,body{height:100%}
+      body{margin:0;display:flex;align-items:center;justify-content:center;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+      body.login-bg{background-image:linear-gradient(rgba(6,10,20,0.36), rgba(6,10,20,0.18)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Indian_Museum%2C_Courtyard%2C_Kolkata%2C_India.jpg/330px-Indian_Museum%2C_Courtyard%2C_Kolkata%2C_India.jpg');background-size:cover;background-position:center center;}
+
+      /* Centering container */
+      .login-stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
+
+      /* Rich card */
+      .login-wrap{max-width:460px;width:100%;margin:0 auto;padding:26px;background:rgba(255,255,255,0.96);border-radius:16px;box-shadow:0 20px 60px rgba(8,12,20,0.45);backdrop-filter:blur(6px);border-left:6px solid #f0872b}
+      .login-wrap h2{margin:0 0 14px;font-family:'Playfair Display', serif;font-size:1.8rem;color:#0f172a}
+      .login-wrap label{display:block;font-weight:600;margin-bottom:6px;color:#334155}
+      .login-wrap .rect-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);margin-bottom:12px}
+      .login-row{display:flex;gap:12px;margin-top:6px}
+      .login-row .btn{flex:1}
+      .meta{font-size:0.92rem;color:#475569;margin-top:12px}
+      .back{display:inline-block;margin-top:14px;color:#475569}
+
+      /* Accent primary button style for login page */
+      .login-wrap .btn{background:#f0872b;color:#fff;border-radius:12px;padding:10px 14px;border:0;font-weight:700}
+      .login-wrap .btn.secondary{background:transparent;color:#0f172a;border:1px solid rgba(15,23,42,0.06)}
+
+      /* Responsive tweaks */
+      @media (max-width:520px){
+        .login-wrap{padding:18px;border-radius:12px;margin:18px}
+        .login-wrap h2{font-size:1.4rem}
+        .login-row{flex-direction:column}
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container login-stage">
+      <div class="login-wrap" role="form" aria-labelledby="login-title">
+        <h2>Sign in / Sign up</h2>
+        <div>
+          <label>Username</label>
+          <input id="username" class="rect-input" placeholder="no spaces" />
+        </div>
+        <div>
+          <label>Password</label>
+          <input id="password" class="rect-input" type="password" placeholder="password" />
+        </div>
+        <div class="login-row">
+          <button id="btn-signin" class="btn">Sign in</button>
+          <button id="btn-signup" class="btn secondary">Create account</button>
+        </div>
+        <div id="login-msg" class="meta"></div>
+        <a class="back" href="index.html">← Back to directory</a>
+      </div>
+    </main>
+
+    <script>
+      // apply body background class after DOM load to avoid flash
+      document.documentElement.classList.remove('no-js');
+      document.body.classList.add('login-bg');
+      const STORAGE_KEY = 'museum_app_v1';
+      function loadApp(){ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return {users:{},currentUser:null}; try{return JSON.parse(raw);}catch(e){return {users:{},currentUser:null}} }
+      function saveApp(a){ localStorage.setItem(STORAGE_KEY, JSON.stringify(a)); }
+      async function sha256(str){ const enc = new TextEncoder(); const data = enc.encode(str); const hash = await crypto.subtle.digest('SHA-256', data); return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+      const userEl = document.getElementById('username');
+      const passEl = document.getElementById('password');
+      const msgEl = document.getElementById('login-msg');
+      const btnSignIn = document.getElementById('btn-signin');
+      const btnSignUp = document.getElementById('btn-signup');
+
+      btnSignIn.addEventListener('click', async ()=>{
+        const u = (userEl.value||'').trim(); const p = passEl.value||''; if(!u){ msgEl.textContent='Enter username'; return; }
+        const app = loadApp();
+        if(!app.users[u]){ msgEl.textContent = 'No account found. Click Create account to sign up.'; return; }
+        const h = await sha256(p);
+        if(h === app.users[u].passwordHash){ app.currentUser = u; saveApp(app); msgEl.textContent = 'Signed in — redirecting...'; setTimeout(()=>location.href='index.html',700); }
+        else { msgEl.textContent = 'Invalid password'; }
+      });
+
+      btnSignUp.addEventListener('click', async ()=>{
+        const u = (userEl.value||'').trim(); const p = passEl.value||''; if(!u){ msgEl.textContent='Enter username'; return; }
+        if(/\\s/.test(u)){ msgEl.textContent='Username cannot contain spaces'; return; }
+        if(!p){ msgEl.textContent='Enter a password'; return; }
+        const app = loadApp();
+        if(app.users[u]){ msgEl.textContent='Account already exists — try Sign in'; return; }
+        const h = await sha256(p);
+        app.users[u] = {passwordHash:h, data:{wishlist:[],visited:[],favorites:[],reviews:{},points:0}};
+        app.currentUser = u; saveApp(app); msgEl.textContent='Account created — redirecting...'; setTimeout(()=>location.href='index.html',700);
+      });
+    </script>
+  </body>
+</html>

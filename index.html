@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Museum Yatra</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">Museum Yatra</div>
+      <nav class="nav">
+        <button id="nav-directory" class="nav-btn active">Directory</button>
+        <button id="nav-scanner" class="nav-btn">Scanner</button>
+        <button id="nav-dashboard" class="nav-btn">Dashboard</button>
+        <button id="nav-badges" class="nav-btn">Badges</button>
+      </nav>
+      <div id="auth-actions" class="auth-actions">
+        <span id="user-display"></span>
+        <button id="btn-login" class="nav-btn">Login / Signup</button>
+        <button id="btn-logout" class="nav-btn hidden">Logout</button>
+        <button id="btn-reset-journey" class="nav-btn hidden" title="Reset your journey">Reset Journey</button>
+        <button id="btn-delete-account" class="nav-btn hidden" title="Delete your account">Delete Account</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="directory-view" class="directory-bg">
+        <!-- Banner: scrolling top museum thumbnails -->
+        <div id="hero-banner" class="banner" aria-hidden="false">
+          <div class="banner-track" id="banner-track"></div>
+        </div>
+
+        <div class="controls">
+          <input id="search" placeholder="Search museums or city..." />
+        </div>
+        <div id="museum-list" class="grid"></div>
+      </section>
+
+      <!-- Scanner feature removed: clicking Scanner will open Google Lens / Image Search directly -->
+
+      <section id="dashboard-view" class="hidden">
+        <h2>My Cultural Journey</h2>
+        <div class="dashboard">
+          <div class="dash-column">
+            <h3>Wishlist</h3>
+            <ul id="wishlist" class="dash-list"></ul>
+          </div>
+          <div class="dash-column">
+            <h3>Visited Log</h3>
+            <ul id="visited" class="dash-list"></ul>
+          </div>
+          <div class="dash-column">
+            <h3>Favorites</h3>
+            <ul id="favorites" class="dash-list"></ul>
+          </div>
+        </div>
+      </section>
+      
+      <section id="badges-view" class="hidden">
+        <h2>Badges</h2>
+    <div class="badges-grid" id="badges-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px"></div>
+      </section>
+    </main>
+
+    <!-- Museum Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="modal-close" class="close">x</button>
+        <div id="profile"></div>
+      </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="review-close" class="close">x</button>
+        <div id="review-content">
+          <h3>Review your visit</h3>
+          <div id="star-rating"></div>
+          <textarea id="review-note" placeholder="Write your notes (e.g., 'Great guide, cafe closed')" rows="4" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd"></textarea>
+          <div style="margin-top:10px;text-align:right">
+            <button id="save-review" class="btn">Save Visit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div id="scanner-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="scanner-close" class="close">x</button>
+        <h3>Artifact Scanner</h3>
+        <video id="scanner-video" autoplay playsinline style="width:100%;max-height:360px;background:#000;border-radius:8px"></video>
+        <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
+          <button id="capture" class="btn">Capture</button>
+          <button id="stop-camera" class="btn secondary">Stop</button>
+        </div>
+        <div style="margin-top:12px;">
+          <label for="upload-image" style="display:block;margin-bottom:6px;font-weight:600">Or upload an image:</label>
+          <input id="upload-image" type="file" accept="image/*" />
+          <div style="font-size:0.9rem;color:#444;margin-top:6px">Upload a photo of an artifact; the app will classify it locally and provide web search links for more information.</div>
+        </div>
+        <div id="scan-result" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- On-screen rectangle overlay (used instead of prompt/alert) -->
+    <div id="rect-overlay" class="rect-overlay hidden" aria-hidden="true">
+      <div class="rect-box" role="dialog" aria-modal="true">
+        <!-- content filled dynamically by script.js -->
+      </div>
+    </div>
+
+    <footer class="site-footer">Made with ❤️ for exploring India's museums.</footer>
+
+    <!-- TensorFlow.js and MobileNet (used by artifact scanner) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
